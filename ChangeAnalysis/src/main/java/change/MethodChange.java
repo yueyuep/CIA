@@ -8,21 +8,20 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
+ * @author yueyue
  * Create by yueyue on 2020/12/18
  */
 public class MethodChange {
     String classpath = "";
     private String methodName = "";
     private CtMethod ctMethod = null;
-    HashMap<String, CtVariable> stringCtParameterHashMap = new HashMap<>();
+    HashMap<String, List<CtVariable>> stringCtParameterHashMap = new HashMap<>();
 
 
     public MethodChange(CtMethod ctMethod, List<CtVariable> variables) {
         this.ctMethod = ctMethod;
         this.methodName = ctMethod.getSimpleName();
-        variables.forEach(ctVariable -> {
-            stringCtParameterHashMap.put(ctVariable.getSimpleName(), ctVariable);
-        });
+        stringCtParameterHashMap.put(methodName, variables);
         this.classpath = ctMethod.getParent(CtClass.class).getSimpleName();
 
     }
@@ -39,8 +38,7 @@ public class MethodChange {
         return ctMethod;
     }
 
-    public HashMap<String, CtVariable> getStringCtParameterHashMap() {
+    public HashMap<String, List<CtVariable>> getStringCtParameterHashMap() {
         return stringCtParameterHashMap;
     }
-
 }

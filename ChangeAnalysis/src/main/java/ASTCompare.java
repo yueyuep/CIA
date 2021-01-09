@@ -1,4 +1,5 @@
 import change.MethodChange;
+import change.VaribaleChange;
 import gumtree.spoon.AstComparator;
 import gumtree.spoon.diff.Diff;
 import gumtree.spoon.diff.operations.Operation;
@@ -8,16 +9,17 @@ import process.MethodProcess;
 import spoon.Launcher;
 import spoon.processing.AbstractProcessor;
 import spoon.processing.ProcessingManager;
-import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.factory.Factory;
-import spoon.reflect.visitor.filter.TypeFilter;
 import spoon.support.QueueProcessingManager;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+
 /**
  * @Author:yueyue on 2020/12/18 17:17
  * @Param:
@@ -25,28 +27,34 @@ import java.util.List;
  * @Description: use Gumtree AST to compare
  */
 public class ASTCompare {
-    AstComparator astComparator = null;
-    FileMap fileMap = null;
+    private FileMap fileMap = null;
+    private List<VaribaleChange> allvarchanges = new ArrayList<>();
 
 
     public ASTCompare(FileMap fileMap) {
         this.fileMap = fileMap;
-        astComparator = new AstComparator();
+
 
     }
 
     public void compare() {
         try {
-            process();
+
+            /*todo process field*/
+            processfield();
+            processmodify();
             procesDelete();
             processAdd();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
-    private void process() throws Exception {
+    public void processfield() {
+        /*todo */
+    }
+
+    private void processmodify() throws Exception {
         HashMap<String, String> pairFile = fileMap.getFile2file();
         for (String src : pairFile.keySet()) {
             MethodProcess methodProcess_old = (MethodProcess) parse(fileMap.getSourcedir() + src, new MethodProcess());
@@ -68,17 +76,16 @@ public class ASTCompare {
         return abstractProcessor;
     }
 
-    private List<CtVariable> filterParameters(List<Operation> operations) {
-        List<CtVariable> ctVariableList1 = new ArrayList<>();
+    private void filterVariableChangeSet(CtMethod ctMethod, List<Operation> operations) {
         for (Operation op : operations) {
-            CtElement src = op.getSrcNode();
-            CtElement dist = op.getDstNode();
-            List<CtVariable> srcVar = src.getElements(new TypeFilter<>(CtVariable.class));
-            List<CtVariable> distVal = dist.getElements(new TypeFilter<>(CtVariable.class));
-            ctVariableList1.addAll(srcVar);
-            ctVariableList1.addAll(distVal);
+            VaribaleChange vc = VaribaleChange.newInstance(ctMethod, op);
+            if (vc == null) {
+                continue;
+            } else {
+                allvarchanges.add(vc);
+            }
+
         }
-        return ctVariableList1;
     }
 
     /*compare Ctmethod(inclue Ctvariable)*/
@@ -98,44 +105,95 @@ public class ASTCompare {
 
         }
         MethodMap methodMap = new MethodMap(oldMethod, newMethod);
-        /*changetype
-         * method2method
-         * addmethod
-         * deletemethod
-         *
+
+
+        /*changetype、method2method、addmethod、 deletemethod
          * */
         HashMap<MethodChange, MethodChange> method2method = methodMap.getMethod2method();
         List<MethodChange> addmethod = methodMap.getAddmethod();
         List<MethodChange> deletemethod = methodMap.getDeletemethod();
 
-        /*process pair*/
+        /*compare pairmethod*/
         for (MethodChange oldpair : method2method.keySet()) {
             MethodChange newpair = method2method.get(oldpair);
             AstComparator astComparator = new AstComparator();
             Diff pairResult = astComparator.compare(oldpair.getCtMethod(), newpair.getCtMethod());
+            if (pairResult.getAllOperations().size() != 0) {
+                List<Operation> diff = pairResult.getAllOperations();
+                filterVariableChangeSet(newpair.getCtMethod(), diff);
+
+            } else {
+                System.out.printf("NO AST Change");
+
+            }
 
 
         }
-        /*procedd add*/
+        /*compare addmethod*/
         for (MethodChange newadd : addmethod) {
             /*todo only get add variable*/
+            CtMethod addm = newadd.getCtMethod();
+            HashMap<String, List<CtVariable>> methodvariableList = newadd.getStringCtParameterHashMap();
+            List<CtVariable> addvariablechange = methodvariableList.get(newadd.getMethodName());
+            addvariablechange.forEach(va -> {
+                VaribaleChange varibaleChange = new VaribaleChange(addm, va);
+                allvarchanges.add(varibaleChange);
+            });
 
         }
 
-        /*process delete*/
+        /*compare deletemethod*/
 
         for (MethodChange olddelete : deletemethod) {
             /*todo only get delete variable*/
+            CtMethod addm = olddelete.getCtMethod();
+            HashMap<String, List<CtVariable>> methodvariableList = olddelete.getStringCtParameterHashMap();
+            List<CtVariable> addvariablechange = methodvariableList.get(olddelete.getMethodName());
+            addvariablechange.forEach(va -> {
+                VaribaleChange varibaleChange = new VaribaleChange(addm, va);
+                allvarchanges.add(varibaleChange);
+            });
 
         }
 
 
     }
 
+    /*process delete file*/
+
     private void procesDelete() {
+        Set<String> delFile = fileMap.getDeleteFile();
+        for (String del : delFile) {
+            MethodProcess methodProcess_old = (MethodProcess) parse(del + fileMap.getSourcedir(), new MethodProcess());
+            HashMap<CtMethod, List<CtVariable>> methodListHashMap = methodProcess_old.getCtMethodList();
+            singleMethodCompare(methodListHashMap);
+        }
     }
 
+    /*process add file*/
     private void processAdd() {
+        Set<String> addFile = fileMap.getAddFile();
+        for (String add : addFile) {
+            MethodProcess methodProcess_new = (MethodProcess) parse(add + fileMap.getSourcedir(), new MethodProcess());
+            HashMap<CtMethod, List<CtVariable>> methodListHashMap = methodProcess_new.getCtMethodList();
+            singleMethodCompare(methodListHashMap);
+        }
+
+
+    }
+    /*process single file(add or delete)*/
+
+    private void singleMethodCompare(HashMap<CtMethod, List<CtVariable>> ctMethodListHashMap) {
+        for (CtMethod ctMethod : ctMethodListHashMap.keySet()) {
+            List<CtVariable> variables = ctMethodListHashMap.get(ctMethod);
+            variables.forEach(ctVariable -> {
+                VaribaleChange varibaleChange = new VaribaleChange(ctMethod, ctVariable);
+                if (varibaleChange != null) {
+                    allvarchanges.add(varibaleChange);
+                }
+            });
+
+        }
     }
 
     /*test case*/
@@ -149,5 +207,13 @@ public class ASTCompare {
             List<Operation> operations = result.getRootOperations();
             System.out.printf("diff");
         }
+    }
+
+    public FileMap getFileMap() {
+        return fileMap;
+    }
+
+    public List<VaribaleChange> getAllvarchanges() {
+        return allvarchanges;
     }
 }

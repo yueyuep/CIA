@@ -25,15 +25,15 @@ public class MethodMap {
         List<String> oldmethodName = new ArrayList<>(oldmethod.keySet());
         List<String> newmethodName = new ArrayList<>(newmethod.keySet());
         for (String oldname : oldmethodName) {
-            if (newmethodName.contains(oldmethod)) {
-                method2method.put(oldmethod.get(oldname), newmethod.get(newmethod));
+            if (newmethodName.contains(oldname)) {
+                method2method.put(oldmethod.get(oldname), newmethod.get(oldname));
             } else {
                 deletemethod.add(oldmethod.get(oldname));
             }
         }
         for (String newname : newmethodName) {
-            if (oldmethodName.contains(oldmethod)) {
-                method2method.put(oldmethod.get(newname), newmethod.get(newmethod));
+            if (oldmethodName.contains(newname)) {
+                method2method.put(oldmethod.get(newname), newmethod.get(newname));
             } else {
                 addmethod.add(newmethod.get(newname));
             }
