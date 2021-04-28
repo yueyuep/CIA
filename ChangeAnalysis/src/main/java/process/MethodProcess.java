@@ -18,15 +18,21 @@ import java.util.List;
 public class MethodProcess extends AbstractProcessor<CtMethod<?>> {
     private HashMap<CtMethod, List<CtVariable>> ctMethodList = new HashMap<>();
 
-
     @Override
     public void process(CtMethod<?> element) {
         /*去掉注释*/
         element.setComments(new ArrayList<CtComment>());
+        /*去除日志相关*/
         CtBlock ctBlock = element.getBody();
+        if (ctBlock == null) {
+            /*函数体内容为空*/
+            return;
+        }
         List<CtStatement> newct = new ArrayList<>();
         for (CtStatement ctStatement : ctBlock.getStatements()) {
-            if (ctStatement.toString().contains("System.out")) {
+            if (ctStatement.toString().contains("System.out")
+                    || ctStatement.toString().contains("Logger")
+                    || ctStatement.toString().contains("logger")) {
                 continue;
             } else {
                 newct.add(ctStatement);

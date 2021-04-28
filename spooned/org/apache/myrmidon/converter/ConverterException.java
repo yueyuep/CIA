@@ -1,0 +1,36 @@
+/* Copyright (C) The Apache Software Foundation. All rights reserved.
+
+This software is published under the terms of the Apache Software License
+version 1.1, a copy of which has been included with this distribution in
+the LICENSE file.
+ */
+package org.apache.myrmidon.converter;
+import org.apache.avalon.framework.CascadingException;
+/**
+ * ConverterException thrown when a problem occurs during convertion etc.
+ *
+ * @author <a href="mailto:donaldp@apache.org">Peter Donald</a>
+ */
+public class ConverterException extends org.apache.avalon.framework.CascadingException {
+    /**
+     * Basic constructor with a message
+     *
+     * @param message
+     * 		the message
+     */
+    public ConverterException(final java.lang.String message) {
+        this(message, null);
+    }
+
+    /**
+     * Constructor that builds cascade so that other exception information can be retained.
+     *
+     * @param message
+     * 		the message
+     * @param throwable
+     * 		the throwable
+     */
+    public ConverterException(final java.lang.String message, final java.lang.Throwable throwable) {
+        super(message, throwable);
+    }
+}

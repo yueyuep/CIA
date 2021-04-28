@@ -33,7 +33,7 @@ public class FileMap {
         boolean flagadd = false;
         for (String sourcepath : source) {
             for (String targetpath : target) {
-                if (source.equals(target)) {
+                if (sourcepath.equals(targetpath)) {
                     flagdelete = true;
                     file2file.put(sourcepath, targetpath);
                     break;
@@ -46,14 +46,14 @@ public class FileMap {
         }
         for (String targetpath : target) {
             for (String sourcepath : source) {
-                if (source.equals(target)) {
+                if (sourcepath.equals(targetpath)) {
                     flagadd = true;
                     break;
                 }
             }
             if (!flagadd) {
                 flagadd = false;
-                deleteFile.add(targetpath);
+                addFile.add(targetpath);
             }
         }
 

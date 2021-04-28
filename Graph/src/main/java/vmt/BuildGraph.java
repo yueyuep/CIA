@@ -9,6 +9,7 @@ import vmt.enity.VmtF;
 import vmt.enity.VmtM;
 import vmt.graph.Ast2Graph;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,6 +19,12 @@ import java.util.List;
  * @Description:
  */
 public class BuildGraph {
+
+    private List<VMT> vmtField = new ArrayList<>();
+    private List<VmtM> vmtMethod = new ArrayList<>();
+    private CompilationUnit cu = null;
+    private Ast2Graph ast2Graph = null;
+
     public BuildGraph(List<SourceRoot> sourceRoots, ProjectInfo projectInfo) throws Exception {
         for (SourceRoot sourceRoot : sourceRoots) {
             sourceRoot.getParserConfiguration().setAttributeComments(false);
@@ -29,6 +36,7 @@ public class BuildGraph {
                     build(classVmt);
 
 
+
                 });
             }
         }
@@ -36,12 +44,26 @@ public class BuildGraph {
 
     public void build(ClassVmt classVmt) {
         /*get information from classvMT*/
-        List<VMT> vmtField = classVmt.getFieldList();
-        List<VmtM> vmtMethod = classVmt.getMethodList();
-        CompilationUnit cu = classVmt.getCu();
-        Ast2Graph ast2Graph = new Ast2Graph(cu);
-
+        this.vmtField = classVmt.getFieldList();
+        this.vmtMethod = classVmt.getMethodList();
+        this.cu = classVmt.getCu();
+        this.ast2Graph = new Ast2Graph(cu);
 
     }
 
+    public List<VMT> getVmtField() {
+        return vmtField;
+    }
+
+    public List<VmtM> getVmtMethod() {
+        return vmtMethod;
+    }
+
+    public CompilationUnit getCu() {
+        return cu;
+    }
+
+    public Ast2Graph getAst2Graph() {
+        return ast2Graph;
+    }
 }

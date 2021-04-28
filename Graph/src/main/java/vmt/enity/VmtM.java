@@ -11,14 +11,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-
 /**
  * @author :yueyue on 2020/12/19 12:01
  * @param :
  * @return:
  * @Description: variable of method
  */
-
 /*class method*/
 public class VmtM {
     /*methodbody*/
@@ -39,7 +37,6 @@ public class VmtM {
     public VmtM() {
 
     }
-
     public VmtM(MethodDeclaration methodDeclaration) {
         /*todo init all field */
 

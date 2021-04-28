@@ -10,12 +10,34 @@ import org.junit.Test;
 import vmt.graph.Ast2Graph;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * Create by yueyue on 2020/12/24
  */
 public class BuildGraphTest {
+
+    static void function(Queue queue) {
+
+        for (int i = 0; i < 10; i++) {
+
+            //reove the head of the queue
+            queue.remove();
+            //insert queue
+            queue.add(i);
+
+        }
+    }
+
+    @Test
+    public void f() {
+        String s = "";
+        if (s == null) {//用于控制流程的条件表达式"s==null"恒为假
+
+        }
+    }
 
     @Test
     public void build() {
@@ -43,4 +65,25 @@ public class BuildGraphTest {
 
 
     }
+
+    @Test
+    public int casecode() {
+
+        for (int i = 0; i < 10; i++) {
+            System.out.println("i:" + i);
+        }
+        double r = 2.0;
+        double area = Math.pow(r, 2) * Math.PI;
+        int a = 0;
+        if (a > 0) {
+            return a;
+        } else {
+            return Math.abs(a);
+        }
+
+
+    }
+
+
+
 }

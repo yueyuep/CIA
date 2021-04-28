@@ -31,5 +31,5 @@ public interface GraphEdge {
     String EDGE_FORMAL_ARG_NAME = "formal_arg_name";
 
 
-    /*graph utils*/
+    /*graph commons*/
 }

@@ -1,0 +1,27 @@
+/* Copyright (C) The Apache Software Foundation. All rights reserved.
+
+This software is published under the terms of the Apache Software License
+version 1.1, a copy of which has been included with this distribution in
+the LICENSE file.
+ */
+package org.apache.myrmidon.libs.selftest;
+import org.apache.myrmidon.api.AbstractTask;
+import org.apache.myrmidon.api.TaskException;
+/**
+ * This is to test whether content is added.
+ *
+ * @author <a href="mailto:donaldp@apache.org">Peter Donald</a>
+ */
+public class ContentTest extends org.apache.myrmidon.api.AbstractTask {
+    public void addContent(final java.lang.Integer value) {
+        getLogger().warn("Integer content: " + value);
+    }
+
+    /* public void addContent( final String blah )
+    {
+    System.out.println( "String content: " + blah );
+    }
+     */
+    public void execute() throws org.apache.myrmidon.api.TaskException {
+    }
+}
